@@ -58,9 +58,12 @@ func (a *App) GetRuntimeData(start string, end string) (RuntimeData, error) {
 		"startDate": start,
 		"endDate":   end,
 		"columns": strings.Join([]string{
+			"auxHeat1", "auxHeat2", "auxHeat3", "compCool1", "compCool2",
+			"compHeat1", "compHeat2", "dehumidifier", "dmOffset", "economizer",
 			"fan", "humidifier", "hvacMode", "outdoorHumidity", "outdoorTemp", "sky",
 			"ventilator", "wind", "zoneAveTemp", "zoneCalendarEvent", "zoneClimate",
-			"zoneCoolTemp", "zoneHeatTemp", "zoneHumidity", "zoneHvacMode", "zoneOccupancy",
+			"zoneCoolTemp", "zoneHeatTemp", "zoneHumidity", "zoneHumidityHigh",
+			"zoneHumidityLow", "zoneHvacMode", "zoneOccupancy",
 		}, ","),
 		"includeSensors": true,
 		"selection": map[string]string{
