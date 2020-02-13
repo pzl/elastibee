@@ -186,7 +186,7 @@ func archive(a *eco.App, start time.Time) error {
 		time.Sleep(8 * time.Second)
 		if tty {
 			w.Up(4)
-			w.Column(35)
+			w.Column(36)
 			fmt.Print(": " + finished)
 			w.ClearDown()
 			w.Down(1)
