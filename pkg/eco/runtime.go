@@ -8,6 +8,8 @@ import (
 	"strings"
 )
 
+// https://www.ecobee.com/home/developer/api/documentation/v1/operations/get-runtime-report.shtml
+
 type sensor struct {
 	ID    string `json:"sensorId"`
 	Name  string `json:"sensorName"`
@@ -175,6 +177,7 @@ func parseRuntime(d []byte) (RuntimeData, error) {
 						},
 					}
 
+					// https://www.ecobee.com/home/developer/api/documentation/v1/objects/RuntimeSensorMetadata.shtml
 					switch sensor.Type {
 					case "occupancy", "dryContact":
 						if f == "0" {
