@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-	"path"
 )
 
 func (c Client) CreateIndexFromFile(idx string, file string) error {
@@ -43,7 +42,7 @@ func (c Client) CreateIndex(idx string, body io.Reader) error {
 }
 
 func (c Client) IndexExists(idx string) bool {
-	res, err := c.http.Get(path.Join(c.Host, idx))
+	res, err := c.http.Get(c.Host + "/" + idx)
 	if err != nil {
 		return true
 	}
