@@ -107,67 +107,87 @@ func main() {
 }
 
 func archive(a *eco.App, start time.Time) error {
+	tty := tui.IsTTY(os.Stdout.Fd())
 	os.MkdirAll("archive", 0755) // nolint
 	client := elastic.New("http://estc:9200")
 	if !client.IndexExists(index) {
 		if err := client.CreateIndexFromFile(index, indexFile); err != nil {
 			return err
 		}
+		if tty {
+			fmt.Printf("index %s%s%s%s created\n", ansi.Bold, ansi.Magenta, index, ansi.Reset)
+		} else {
+			fmt.Printf("index %s created\n", index)
+		}
 	}
 
-	tty := tui.IsTTY(os.Stdout.Fd())
 	w := ansi.NewWriter(os.Stdout)
 	if tty {
 		w.CursorHide()
 		defer w.CursorShow()
 	}
 
-	done := fmt.Sprintf("%s%sDone%s", ansi.Bold, ansi.Green, ansi.Reset)
+	finished := fmt.Sprintf("%s%s✔%s", ansi.Bold, ansi.Green, ansi.Reset)
 
 	now := time.Now()
 	for t := start; t.Before(now.UTC().Truncate(24 * time.Hour)); t = t.AddDate(0, 0, 20) {
+		done := make(chan struct{})
 
 		if tty {
 			fmt.Printf("Date range %s%s%s%s -> %s%s%s%s\n  Fetching: \n  Transforming: \n  Sending: \n  Saving: ", ansi.Cyan, ansi.Bold, t.Format("2006-01-02"), ansi.Reset, ansi.Cyan, ansi.Bold, t.AddDate(0, 0, 19).Format("2006-01-02"), ansi.Reset)
-		}
-
-		data, err := a.GetRuntimeData(t.Format("2006-01-02"), t.AddDate(0, 0, 19).Format("2006-01-02"))
-		if err != nil {
-			return err
-		}
-		if tty {
 			w.Up(3)
-			w.Column(13)
-			fmt.Print(done)
+			w.Column(14)
+			go spin(done, w)
 		}
-
-		nd, err := toNdJson(data)
+		data, err := a.GetRuntimeData(t.Format("2006-01-02"), t.AddDate(0, 0, 19).Format("2006-01-02"))
+		if tty {
+			done <- struct{}{}
+		}
 		if err != nil {
 			return err
 		}
 		if tty {
+			w.Column(13)
+			fmt.Print(finished)
 			w.Down(1)
+			w.Column(18)
+			go spin(done, w)
+		}
+		nd, err := toNdJson(data)
+		if tty {
+			done <- struct{}{}
+		}
+		if err != nil {
+			return err
+		}
+		if tty {
 			w.Column(17)
-			fmt.Print(done)
+			fmt.Print(finished)
+			w.Down(1)
+			w.Column(13)
+			go spin(done, w)
 		}
 
 		file := "archive/" + t.Format("20060102") + "-" + t.AddDate(0, 0, 19).Format("20060102") + ".json"
-		if err := stream(nd, client, file); err != nil {
-			panic(err)
+		err = stream(nd, client, file)
+		if tty {
+			done <- struct{}{}
+		}
+		if err != nil {
+			return err
 		}
 		if tty {
-			w.Down(1)
 			w.Column(12)
-			fmt.Print(done)
+			fmt.Print(finished)
 			w.Down(1)
 			w.Column(11)
-			fmt.Print(done)
+			fmt.Print(finished)
 		}
-		time.Sleep(15 * time.Second)
+		time.Sleep(8 * time.Second)
 		if tty {
 			w.Up(4)
 			w.Column(35)
-			fmt.Print(": " + done)
+			fmt.Print(": " + finished)
 			w.ClearDown()
 			w.Down(1)
 			w.Column(0)
@@ -175,6 +195,22 @@ func archive(a *eco.App, start time.Time) error {
 	}
 	fmt.Printf("archive done\n")
 	return nil
+}
+
+func spin(done chan struct{}, w *ansi.Writer) {
+	boxes := []rune(`⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏`)
+	blen := len(boxes)
+	tick := time.NewTicker(100 * time.Millisecond)
+	defer tick.Stop()
+	for i := 0; true; i++ {
+		select {
+		case <-done:
+			return
+		case <-tick.C:
+			w.Left(1)
+			fmt.Printf("%c", boxes[i%blen])
+		}
+	}
 }
 
 func toNdJson(data eco.RuntimeData) (io.Reader, error) {
