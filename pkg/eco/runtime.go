@@ -103,6 +103,7 @@ func parseRuntime(d []byte) (RuntimeData, error) {
 				"date":       fields[0],
 				"time":       fields[1],
 				"@timestamp": fields[0] + "T" + fields[1],
+				"type":       "thermostat",
 			}
 			fields = fields[2:]
 			for j, c := range cols {
@@ -161,6 +162,7 @@ func parseRuntime(d []byte) (RuntimeData, error) {
 					data := map[string]interface{}{
 						"date":       date,
 						"time":       tm,
+						"type":       "sensor",
 						"@timestamp": date + "T" + tm,
 						"sensor": map[string]string{
 							"id":    sensor.ID,
@@ -171,20 +173,26 @@ func parseRuntime(d []byte) (RuntimeData, error) {
 					}
 
 					switch sensor.Type {
-					case "occupancy":
+					case "occupancy", "dryContact":
 						if f == "0" {
-							data["value"] = false
+							data[sensor.Type] = false
 						} else {
-							data["value"] = true
+							data[sensor.Type] = true
 						}
 					case "temperature":
 						if num, err := strconv.ParseFloat(f, 64); err == nil {
-							data["value"] = num
+							data[sensor.Type] = num
 						} else {
-							data["value"] = f
+							data[sensor.Type] = f
+						}
+					case "co2", "ctclamp", "humidity", "plug", "pulsedElectricityMeter":
+						if num, err := strconv.Atoi(f); err == nil {
+							data[sensor.Type] = num
+						} else { // failed to convert
+							data[sensor.Type] = f
 						}
 					default:
-						data["value"] = f
+						data[sensor.Type] = f
 					}
 
 					rd.SensorData = append(rd.SensorData, data)

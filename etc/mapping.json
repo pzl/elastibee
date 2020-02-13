@@ -1,0 +1,161 @@
+{
+	"mappings": {
+		"properties": {
+			"@timestamp": {
+				"type": "date",
+				"format": "date_hour_minute_second"
+			},
+			"HVACmode": {
+				"type": "keyword",
+				"ignore_above": 50
+			},
+			"auxHeat1": {
+				"type": "integer"
+			},
+			"auxHeat2": {
+				"type": "integer"
+			},
+			"auxHeat3": {
+				"type": "integer"
+			},
+			"co2": {
+				"type": "integer"
+			},
+			"compCool1": {
+				"type": "integer"
+			},
+			"compCool2": {
+				"type": "integer"
+			},
+			"compHeat1": {
+				"type": "integer"
+			},
+			"compHeat2": {
+				"type": "integer"
+			},
+			"ctclamp": {
+				"type": "integer"
+			},
+			"date": {
+				"type": "date",
+				"format": "date"
+			},
+			"dehumidifier": {
+				"type": "integer"
+			},
+			"dmOffset": {
+				"type": "float"
+			},
+			"dryContact": {
+				"type": "boolean"
+			},
+			"economizer": {
+				"type": "integer"
+			},
+			"fan": {
+				"type": "integer"
+			},
+			"humidifier": {
+				"type": "integer"
+			},
+			"humidity": {
+				"type": "integer"
+			},
+			"outdoorHumidity": {
+				"type": "integer"
+			},
+			"outdoorTemp": {
+				"type": "float"
+			},
+			"plug": {
+				"type": "integer"
+			},
+			"pulsedElectricityMeter": {
+				"type": "integer"
+			},
+			"sensor": {
+				"properties": {
+					"id": {
+						"type": "text",
+						"fields": {
+							"keyword": {
+								"type": "keyword",
+								"ignore_above": 256
+							}
+						}
+					},
+					"name": {
+						"type": "text",
+						"fields": {
+							"keyword": {
+								"type": "keyword",
+								"ignore_above": 256
+							}
+						}
+					},
+					"type": {
+						"type": "keyword",
+						"ignore_above": 256
+					},
+					"usage": {
+						"type": "keyword",
+						"ignore_above": 256
+					}
+				}
+			},
+			"sky": {
+				"type": "integer"
+			},
+			"temperature": {
+				"type": "float"
+			},
+			"time": {
+				"type": "date",
+				"format": "hour_minute_second"
+			},
+			"type": {
+				"type": "keyword",
+				"ignore_above": 256
+			},
+			"ventilator": {
+				"type": "integer"
+			},
+			"wind": {
+				"type": "integer"
+			},
+			"zoneAveTemp": {
+				"type": "float"
+			},
+			"zoneCalendarEvent": {
+				"type": "keyword",
+				"ignore_above": 256
+			},
+			"zoneClimate": {
+				"type": "keyword",
+				"ignore_above": 50
+			},
+			"zoneCoolTemp": {
+				"type": "float"
+			},
+			"zoneHVACmode": {
+				"type": "keyword",
+				"ignore_above": 256
+			},
+			"zoneHeatTemp": {
+				"type": "float"
+			},
+			"zoneHumidity": {
+				"type": "integer"
+			},
+			"zoneHumidityHigh": {
+				"type": "integer"
+			},
+			"zoneHumidityLow": {
+				"type": "integer"
+			},
+			"zoneOccupancy": {
+				"type": "boolean"
+			}
+		}
+	}
+}

@@ -1,2 +1,4 @@
 *.key
-*.json
+app.json
+archive
+backup
